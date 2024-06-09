@@ -6,7 +6,7 @@ import com.example.spring_into.model.Owner;
 import org.springframework.stereotype.Component;
 
 @Component
-public class OwnerConveter {
+public class OwnerConverter {
 
    public Owner toOwner(TollRequest tollRequest){
         Owner owner = new Owner();

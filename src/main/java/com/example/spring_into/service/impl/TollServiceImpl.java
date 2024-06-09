@@ -1,6 +1,6 @@
 package com.example.spring_into.service.impl;
 
-import com.example.spring_into.converter.OwnerConveter;
+import com.example.spring_into.converter.OwnerConverter;
 import com.example.spring_into.converter.TollConverter;
 import com.example.spring_into.dto.TollRequest;
 import com.example.spring_into.model.Owner;
@@ -23,10 +23,10 @@ public class TollServiceImpl implements TollService {
     private final TollRepository tollRepository;
     private final TollConverter tollConverter;
     private final OwnerRepository ownerRepository;
-    private final OwnerConveter ownerConveter;
+    private final OwnerConverter ownerConveter;
 
     @Autowired
-    public TollServiceImpl(TollRepository tollRepository, TollConverter tollConverter, OwnerRepository ownerRepository, OwnerConveter ownerConveter) {
+    public TollServiceImpl(TollRepository tollRepository, TollConverter tollConverter, OwnerRepository ownerRepository, OwnerConverter ownerConveter) {
         this.tollRepository = tollRepository;
         this.tollConverter = tollConverter;
         this.ownerRepository = ownerRepository;

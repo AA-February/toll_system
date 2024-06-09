@@ -14,5 +14,5 @@ public interface OwnerService {
 
     Owner updateOwner(OwnerRequest request, Long ownerId);
 
-
+    Owner addOwner(OwnerRequest ownerRequest);
 }
