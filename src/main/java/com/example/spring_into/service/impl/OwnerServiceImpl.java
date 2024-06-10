@@ -1,5 +1,6 @@
 package com.example.spring_into.service.impl;
 
+import com.example.spring_into.converter.OwnerConverter;
 import com.example.spring_into.dto.OwnerRequest;
 import com.example.spring_into.model.Owner;
 import com.example.spring_into.model.TollPass;
@@ -19,9 +20,12 @@ public class OwnerServiceImpl implements OwnerService {
 
     private final OwnerRepository ownerRepository;
 
+    private final OwnerConverter ownerConverter;
+
     @Autowired
-    public OwnerServiceImpl(OwnerRepository ownerRepository) {
+    public OwnerServiceImpl(OwnerRepository ownerRepository, OwnerConverter ownerConverter) {
         this.ownerRepository = ownerRepository;
+        this.ownerConverter = ownerConverter;
     }
 
     @Override
@@ -63,5 +67,10 @@ public class OwnerServiceImpl implements OwnerService {
         return ownerRepository.save(owner);
     }
 
-
+    @Override
+    public Owner addOwner(OwnerRequest ownerRequest) {
+        Owner owner = ownerConverter.toOwner(ownerRequest);
+        ownerRepository.save(owner);
+        return null;
+    }
 }

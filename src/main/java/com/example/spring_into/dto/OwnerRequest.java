@@ -8,8 +8,6 @@ import lombok.Setter;
 @Setter
 @Getter
 public class OwnerRequest {
-
-
     private String firstName;
     private String lastName;
     private String address;
