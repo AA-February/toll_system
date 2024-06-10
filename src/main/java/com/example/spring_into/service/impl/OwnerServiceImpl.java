@@ -25,7 +25,8 @@ public class OwnerServiceImpl implements OwnerService {
     private final OwnerConverter ownerConverter;
 
     @Autowired
-    public OwnerServiceImpl(OwnerRepository ownerRepository, OwnerConverter ownerConverter) {
+    public OwnerServiceImpl(OwnerRepository ownerRepository,
+                            OwnerConverter ownerConverter) {
         this.ownerRepository = ownerRepository;
         this.ownerConverter = ownerConverter;
     }
@@ -81,7 +82,7 @@ public class OwnerServiceImpl implements OwnerService {
 
     @Override
     public OwnerResponse findOwnerById(Long id) {
-        Owner owner = ownerRepository.findById(id).get();
+        Owner owner = ownerRepository.findById(id).orElse(new Owner());
         OwnerResponse ownerResponse = new OwnerResponse();
 
         BeanUtils.copyProperties(owner, ownerResponse);

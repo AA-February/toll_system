@@ -21,8 +21,6 @@ public class OwnerController {
 
     @Autowired
     OwnerService ownerService;
-    @Autowired
-    OwnerRepository ownerRepository;
 
     @PostMapping(path = "/{ownerId}")
     Owner updateOwner(@RequestBody OwnerRequest request,
