@@ -2,11 +2,13 @@ package com.example.spring_into.service.impl;
 
 import com.example.spring_into.converter.OwnerConverter;
 import com.example.spring_into.dto.OwnerRequest;
+import com.example.spring_into.dto.OwnerResponse;
 import com.example.spring_into.model.Owner;
 import com.example.spring_into.model.TollPass;
 import com.example.spring_into.repository.OwnerRepository;
 import com.example.spring_into.service.OwnerService;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -23,7 +25,8 @@ public class OwnerServiceImpl implements OwnerService {
     private final OwnerConverter ownerConverter;
 
     @Autowired
-    public OwnerServiceImpl(OwnerRepository ownerRepository, OwnerConverter ownerConverter) {
+    public OwnerServiceImpl(OwnerRepository ownerRepository,
+                            OwnerConverter ownerConverter) {
         this.ownerRepository = ownerRepository;
         this.ownerConverter = ownerConverter;
     }
@@ -68,9 +71,21 @@ public class OwnerServiceImpl implements OwnerService {
     }
 
     @Override
-    public Owner addOwner(OwnerRequest ownerRequest) {
+    public OwnerResponse addOwner(OwnerRequest ownerRequest) {
         Owner owner = ownerConverter.toOwner(ownerRequest);
-        ownerRepository.save(owner);
-        return null;
+        Owner savedOwner = ownerRepository.save(owner);
+        OwnerResponse ownerResponse = new OwnerResponse();
+
+        BeanUtils.copyProperties(savedOwner, ownerResponse);
+        return ownerResponse;
+    }
+
+    @Override
+    public OwnerResponse findOwnerById(Long id) {
+        Owner owner = ownerRepository.findById(id).orElse(new Owner());
+        OwnerResponse ownerResponse = new OwnerResponse();
+
+        BeanUtils.copyProperties(owner, ownerResponse);
+        return ownerResponse;
     }
 }
