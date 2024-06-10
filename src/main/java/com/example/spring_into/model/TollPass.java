@@ -15,7 +15,7 @@ public class TollPass {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
+    @Column(unique = true)
     private String regNumber;
 
     private String country;

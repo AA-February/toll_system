@@ -3,11 +3,14 @@ package com.example.spring_into.service.impl;
 import com.example.spring_into.converter.OwnerConverter;
 import com.example.spring_into.converter.TollConverter;
 import com.example.spring_into.dto.TollRequest;
+import com.example.spring_into.dto.TollResponse;
+import com.example.spring_into.dto.ValidityResponse;
 import com.example.spring_into.model.Owner;
 import com.example.spring_into.model.TollPass;
 import com.example.spring_into.repository.OwnerRepository;
 import com.example.spring_into.repository.TollRepository;
 import com.example.spring_into.service.TollService;
+import com.example.spring_into.util.Helper;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,35 +38,44 @@ public class TollServiceImpl implements TollService {
 
     @Transactional
     @Override
-    public TollPass addToll(TollRequest tollRequest) throws Exception {
+    public TollResponse addToll(TollRequest tollRequest) {
         Optional<Owner> owner = ownerRepository.findByEmail(tollRequest.getEmail());
         Owner existingOwner;
 
-        if(owner.isEmpty()){
-            log.info("Going to create new owner with identifier: "+ tollRequest.getEmail());
+        if (owner.isEmpty()) {
+            log.info("Going to create new owner with identifier: " + tollRequest.getEmail());
             existingOwner = ownerRepository.save(ownerConveter.toOwner(tollRequest));
 
-        }else {
-            log.info("Going to use existing owner with identifier: "+ tollRequest.getEmail());
+        } else {
+            log.info("Going to use existing owner with identifier: " + tollRequest.getEmail());
             existingOwner = owner.get();
         }
 
         TollPass tollPass = tollConverter.toTollPass(tollRequest);
         tollPass.setOwner(existingOwner);
-        tollRepository.save(tollPass);
-        return null;
+        return tollConverter.toTollResponse(tollRepository.save(tollPass));
     }
 
     @Override
-    public boolean checkValidity(String regNumber, String country) {
-        Optional<TollPass> tollPass = tollRepository.findByRegNumberAndCountry(regNumber,country);
-        //sendFine()
-        if(!tollPass.isEmpty()){
-            return !tollPass.get().getExpDate().isBefore(Instant.now());
-        } else{
-            return false;
+    public ValidityResponse checkValidity(String regNumber, String country) {
+        Optional<TollPass> tollPass = tollRepository.findByRegNumberAndCountry(regNumber, country);
+
+
+        ValidityResponse validityResponse = new ValidityResponse();
+        if (!tollPass.isEmpty()) {
+            Instant expDate = tollPass.get().getExpDate();
+            validityResponse.setValid(isValid(expDate));
+
+            validityResponse.setExpDate(Helper.formatDate(expDate));
+            return validityResponse;
+        } else {
+            return null;
         }
 
+    }
+
+    private boolean isValid(Instant expDate) {
+        return expDate.isAfter(Instant.now());
     }
 
     @Override

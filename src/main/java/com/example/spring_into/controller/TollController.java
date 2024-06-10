@@ -1,10 +1,13 @@
 package com.example.spring_into.controller;
 
 import com.example.spring_into.dto.TollRequest;
+import com.example.spring_into.dto.TollResponse;
+import com.example.spring_into.dto.ValidityResponse;
 import com.example.spring_into.model.TollPass;
 import com.example.spring_into.service.OwnerService;
 import com.example.spring_into.service.TollService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,15 +23,15 @@ public class TollController {
     OwnerService ownerService;
 
     @PostMapping
-    public ResponseEntity<String> addToll(@RequestBody TollRequest tollRequest) throws Exception {
-        tollService.addToll(tollRequest);
-        return null;
+    public ResponseEntity<TollResponse> addToll(@RequestBody TollRequest tollRequest) {
+        return new ResponseEntity<>(tollService.addToll(tollRequest),
+                HttpStatus.CREATED);
     }
 
     @GetMapping
-    public Boolean checkValidity(@RequestParam(name = "regNumber") String regNumber,
-                                 @RequestParam(name = "country") String country) {
-        return tollService.checkValidity(regNumber, country);
+    public ResponseEntity<ValidityResponse> checkValidity(@RequestParam(name = "regNumber") String regNumber,
+                                                          @RequestParam(name = "country") String country) {
+        return new ResponseEntity<>(tollService.checkValidity(regNumber, country), HttpStatus.FOUND);
     }
 
     @GetMapping(path = {"owner/{ownerId}"})

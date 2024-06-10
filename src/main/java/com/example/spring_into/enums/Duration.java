@@ -4,5 +4,6 @@ public enum Duration {
     WEEKEND,
     WEEK,
     MONTH,
-    YEAR
+    YEAR,
+    SEASONAL
 }
