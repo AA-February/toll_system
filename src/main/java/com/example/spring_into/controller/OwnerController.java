@@ -26,11 +26,13 @@ public class OwnerController {
     void deleteOwner(@PathVariable("ownerId") Long ownerId) {
         ownerService.deleteOwnerById(ownerId);
     }
+
     @PostMapping
     ResponseEntity<String> addOwner(@RequestBody OwnerRequest ownerRequest){
         ownerService.addOwner(ownerRequest);
         return null;
     }
+
     @GetMapping("/{id}")
     public Owner getById(@PathVariable("id") long id){
         return ownerRepository.findById(id).get();
