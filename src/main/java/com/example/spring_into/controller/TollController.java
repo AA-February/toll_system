@@ -6,6 +6,7 @@ import com.example.spring_into.dto.ValidityResponse;
 import com.example.spring_into.model.TollPass;
 import com.example.spring_into.service.OwnerService;
 import com.example.spring_into.service.TollService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,7 +24,7 @@ public class TollController {
     OwnerService ownerService;
 
     @PostMapping
-    public ResponseEntity<TollResponse> addToll(@RequestBody TollRequest tollRequest) {
+    public ResponseEntity<TollResponse> addToll(@Valid @RequestBody TollRequest tollRequest) {
         return new ResponseEntity<>(tollService.addToll(tollRequest),
                 HttpStatus.CREATED);
     }
