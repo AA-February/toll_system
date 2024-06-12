@@ -4,6 +4,7 @@ import com.example.spring_into.dto.OwnerResponse;
 import com.example.spring_into.model.Owner;
 import com.example.spring_into.repository.OwnerRepository;
 import com.example.spring_into.service.OwnerService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,7 +24,7 @@ public class OwnerController {
     OwnerService ownerService;
 
     @PostMapping(path = "/{ownerId}")
-    Owner updateOwner(@RequestBody OwnerRequest request,
+    Owner updateOwner(@Valid @RequestBody OwnerRequest request,
                       @PathVariable("ownerId") Long ownerId) {
         return ownerService.updateOwner(request, ownerId);
     }
@@ -34,7 +35,7 @@ public class OwnerController {
     }
 
     @PostMapping
-    ResponseEntity<OwnerResponse> addOwner(@RequestBody OwnerRequest ownerRequest) {
+    ResponseEntity<OwnerResponse> addOwner(@Valid @RequestBody OwnerRequest ownerRequest) {
         ownerService.addOwner(ownerRequest);
 
         return new ResponseEntity<>(ownerService.addOwner(ownerRequest),
