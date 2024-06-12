@@ -5,10 +5,10 @@ spring:
     url: jdbc:mysql://localhost:3306/toll_system?createDatabaseIfNotExist=true
     driverClassName: com.mysql.cj.jdbc.Driver
     username: root
-    password: <your password>
+#    password: <your password>
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: create
     show-sql: true
     format-sql: true
 

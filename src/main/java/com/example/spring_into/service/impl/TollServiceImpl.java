@@ -5,6 +5,7 @@ import com.example.spring_into.converter.TollConverter;
 import com.example.spring_into.dto.TollRequest;
 import com.example.spring_into.dto.TollResponse;
 import com.example.spring_into.dto.ValidityResponse;
+import com.example.spring_into.exception.RecordNotFoundException;
 import com.example.spring_into.model.Owner;
 import com.example.spring_into.model.TollPass;
 import com.example.spring_into.repository.OwnerRepository;
@@ -69,7 +70,8 @@ public class TollServiceImpl implements TollService {
             validityResponse.setExpDate(Helper.formatDate(expDate));
             return validityResponse;
         } else {
-            return null;
+            throw new RecordNotFoundException(String.format("Toll not found for registration number: %s," +
+                    " and country: %s",regNumber,country));
         }
 
     }
@@ -80,7 +82,6 @@ public class TollServiceImpl implements TollService {
 
     @Override
     public void deleteToll(Long tollId) {
-
         log.info("Going to delete toll for id: " + tollId);
         tollRepository.deleteById(tollId);
     }
