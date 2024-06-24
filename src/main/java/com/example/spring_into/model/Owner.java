@@ -21,6 +21,8 @@ public class Owner {
 
     private String email;
 
+    private String password;
+
     private String lastName;
 
     private String firstName;
