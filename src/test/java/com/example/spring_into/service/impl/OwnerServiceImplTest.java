@@ -4,6 +4,7 @@ package com.example.spring_into.service.impl;
 import com.example.spring_into.config.PasswordEncoderConfig;
 import com.example.spring_into.converter.OwnerConverter;
 import com.example.spring_into.dto.OwnerRequest;
+import com.example.spring_into.dto.OwnerResponse;
 import com.example.spring_into.exception.RecordNotFoundException;
 import com.example.spring_into.model.Owner;
 import com.example.spring_into.model.TollPass;
@@ -101,5 +102,26 @@ public class OwnerServiceImplTest {
         ownerRequest.setAddress("Bulgaria,Varna, Tsar Osvoboditel 122");
         ownerRequest.setPassword("123123123");
         return ownerRequest;
+    }
+
+    @Test
+    void findOwnerByID_success() {
+
+        when(ownerRepository.findById(anyLong())).thenReturn(Optional.of(owner));
+
+        OwnerResponse ownerResponse = ownerService.findOwnerById(1L);
+        verify(ownerRepository, times(1)).findById(1L);
+        assertEquals("Ivan", ownerResponse.getFirstName());
+        assertEquals("Ivanov", ownerResponse.getLastName());
+    }
+    @Test
+    void findOwnerById_OwnerNotFound() {
+
+        when((ownerRepository.findById(anyLong()))).thenReturn(Optional.empty());
+
+        RecordNotFoundException exception = assertThrows(RecordNotFoundException.class, () -> ownerService.findOwnerById(1L));
+        assertEquals("Customer with id: 1 not found", exception.getMessage());
+        verify(ownerRepository, times(1)).findById(1L);
+
     }
 }
