@@ -1,5 +1,6 @@
 package com.example.spring_into.service;
 
+import com.example.spring_into.dto.LoginRequest;
 import com.example.spring_into.dto.OwnerRequest;
 import com.example.spring_into.dto.OwnerResponse;
 import com.example.spring_into.model.Owner;
@@ -18,4 +19,6 @@ public interface OwnerService {
     OwnerResponse addOwner(OwnerRequest ownerRequest);
 
     OwnerResponse findOwnerById(Long id);
+
+    OwnerResponse login(LoginRequest loginRequest);
 }

@@ -2,6 +2,7 @@ package com.example.spring_into.dto;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
@@ -20,4 +21,7 @@ public class OwnerRequest {
     private String address;
     @Email
     private String email;
+    @Pattern(regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)[a-zA-Z\\d]{8,}$",
+    message = "Password must contain minimum eight characters, at least one uppercase letter, one lowercase letter and one number")
+    private String password;
 }

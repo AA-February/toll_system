@@ -1,5 +1,7 @@
 package com.example.spring_into.service.impl;
+import com.example.spring_into.config.PasswordEncoderConfig;
 import com.example.spring_into.converter.OwnerConverter;
+import com.example.spring_into.dto.LoginRequest;
 import com.example.spring_into.dto.OwnerRequest;
 import com.example.spring_into.dto.OwnerResponse;
 import com.example.spring_into.exception.RecordNotFoundException;
@@ -23,21 +25,23 @@ public class OwnerServiceImpl implements OwnerService {
 
     private final OwnerConverter ownerConverter;
 
+    private final PasswordEncoderConfig passwordEncoderConfig;
+
     @Autowired
     public OwnerServiceImpl(OwnerRepository ownerRepository,
-                            OwnerConverter ownerConverter) {
+                            OwnerConverter ownerConverter, PasswordEncoderConfig passwordEncoderConfig) {
         this.ownerRepository = ownerRepository;
         this.ownerConverter = ownerConverter;
+        this.passwordEncoderConfig = passwordEncoderConfig;
     }
 
     @Override
     public Set<TollPass> getTollsForOwner(Long ownerId) {
-        Optional<Owner> owner = ownerRepository.findById(ownerId);
-        if (owner.isEmpty()) {
-            return new HashSet<>();
-        } else {
-            return owner.get().getTollPass();
-        }
+        Owner owner = ownerRepository.findById(ownerId).orElseThrow(()-> new RecordNotFoundException("Owner with id "+ ownerId+
+                " not found."));
+
+        return owner.getTollPass();
+
     }
 
     @Override
@@ -47,7 +51,8 @@ public class OwnerServiceImpl implements OwnerService {
 
     @Override
     public Owner updateOwner(OwnerRequest request, Long ownerId) {
-        Owner existingOwner = ownerRepository.findById(ownerId).orElseThrow(()->new RecordNotFoundException(String.format("Customer with id: %s not exists", ownerId)));
+        Owner existingOwner = ownerRepository.findById(ownerId).orElseThrow(()
+                ->new RecordNotFoundException(String.format("Owner with id: %s not exists", ownerId)));
 
         if (request.getLastName() != null) {
             existingOwner.setLastName(request.getLastName());
@@ -80,5 +85,23 @@ public class OwnerServiceImpl implements OwnerService {
         OwnerResponse ownerResponse = new OwnerResponse();
         BeanUtils.copyProperties(owner, ownerResponse);
         return ownerResponse;
+    }
+
+    public OwnerResponse login (LoginRequest loginRequest) {
+        try{
+            Owner owner = ownerRepository.findByEmail(loginRequest.getEmail()).get();
+           if(passwordEncoderConfig.passwordEncoder().matches(loginRequest.getPassword(),owner.getPassword()))
+           {
+               OwnerResponse response = new OwnerResponse();
+               BeanUtils.copyProperties(owner,response);
+               return response;
+            }
+           else {
+               throw  new RecordNotFoundException("User with email not found or incorrect password used.");
+           }
+        } catch (RuntimeException ex){
+            throw  new RecordNotFoundException("User with email not found or incorrect password used.");
+        }
+
     }
 }
