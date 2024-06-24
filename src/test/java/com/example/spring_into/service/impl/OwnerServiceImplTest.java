@@ -3,7 +3,9 @@ package com.example.spring_into.service.impl;
 
 import com.example.spring_into.config.PasswordEncoderConfig;
 import com.example.spring_into.converter.OwnerConverter;
+import com.example.spring_into.dto.LoginRequest;
 import com.example.spring_into.dto.OwnerRequest;
+import com.example.spring_into.dto.OwnerResponse;
 import com.example.spring_into.exception.RecordNotFoundException;
 import com.example.spring_into.model.Owner;
 import com.example.spring_into.model.TollPass;
@@ -20,6 +22,7 @@ import java.util.Optional;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.*;
 
@@ -44,7 +47,7 @@ public class OwnerServiceImplTest {
         owner.setEmail(OWNER_EMAIL);
         owner.setFirstName("Ivan");
         owner.setLastName("Ivanov");
-
+        owner.setPassword("ssdafasfasfasfas");
         tollPass = Set.of(new TollPass());
 
         owner.setTollPass(tollPass);
@@ -101,5 +104,28 @@ public class OwnerServiceImplTest {
         ownerRequest.setAddress("Bulgaria,Varna, Tsar Osvoboditel 122");
         ownerRequest.setPassword("123123123");
         return ownerRequest;
+    }
+
+    @Test
+    void loginSuccessful(){
+        when(ownerRepository.findByEmail(buildLoginRequest().getEmail())).thenReturn(Optional.of(owner));
+        doReturn(true).when(passwordEncoderConfig.passwordEncoder().matches(buildLoginRequest().getPassword(),owner.getPassword()));
+        OwnerResponse ownerResponse = ownerService.login(buildLoginRequest());
+        assertNotNull(ownerResponse);
+        assertEquals(buildLoginRequest().getEmail(),ownerResponse.getEmail());
+
+    }
+    @Test
+    void loginUnsuccessful(){
+        when(ownerRepository.findByEmail(buildLoginRequest().getEmail())).thenReturn(Optional.empty());
+        RecordNotFoundException exception = assertThrows(RecordNotFoundException.class,()->ownerService.login(buildLoginRequest()));
+        verify(ownerRepository,times(1)).findByEmail(buildLoginRequest().getEmail());
+
+    }
+    private LoginRequest buildLoginRequest(){
+        LoginRequest loginRequest = new LoginRequest();
+        loginRequest.setEmail("test@test.com");
+        loginRequest.setPassword("1213123412");
+        return loginRequest;
     }
 }
