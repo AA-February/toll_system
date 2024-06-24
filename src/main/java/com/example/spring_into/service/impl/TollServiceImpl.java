@@ -2,6 +2,7 @@ package com.example.spring_into.service.impl;
 
 import com.example.spring_into.converter.OwnerConverter;
 import com.example.spring_into.converter.TollConverter;
+import com.example.spring_into.dto.OwnerRequest;
 import com.example.spring_into.dto.TollRequest;
 import com.example.spring_into.dto.TollResponse;
 import com.example.spring_into.dto.ValidityResponse;

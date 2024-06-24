@@ -2,13 +2,12 @@ package com.example.spring_into.service.impl;
 
 
 import com.example.spring_into.converter.OwnerConverter;
-import com.example.spring_into.dto.LoginRequest;
 import com.example.spring_into.dto.OwnerRequest;
-import com.example.spring_into.dto.OwnerResponse;
 import com.example.spring_into.exception.RecordNotFoundException;
 import com.example.spring_into.model.Owner;
 import com.example.spring_into.model.TollPass;
 import com.example.spring_into.repository.OwnerRepository;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -17,6 +16,8 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.Optional;
 import java.util.Set;
 
@@ -32,6 +33,12 @@ public class OwnerServiceImplTest {
     private OwnerRepository ownerRepository;
     @Mock
     private OwnerConverter ownerConverter;
+    @Mock
+    private TollRepository tollRepository;
+    @Mock
+    private TollConverter tollConverter;
+    @InjectMocks
+    private TollService tollService;
     @Mock
     private PasswordEncoder passwordEncoder;
     @InjectMocks
@@ -77,7 +84,7 @@ public class OwnerServiceImplTest {
         when(ownerRepository.findById(anyLong())).thenReturn(Optional.of(owner));
         when(ownerRepository.save(any(Owner.class))).thenReturn(any(Owner.class));
 
-       Owner testOwner = ownerService.updateOwner(buildOwnerReques(),1L);
+       Owner testOwner = ownerService.updateOwner(buildOwnerRequest(),1L);
 
         verify(ownerRepository,times(1)).findById(1L);
         verify(ownerRepository,times(1)).save(any(Owner.class));
@@ -147,4 +154,20 @@ public class OwnerServiceImplTest {
         assertEquals("Customer with id: 1 not found", exception.getMessage());
         verify(ownerRepository, times(1)).findById(1L);
     }
+
+
+    @Test
+    void checkValidity() {
+        String regNumber = "A1234B";
+        String country = "Bulgaria";
+        TollPass tollPass1 = new TollPass();
+        Instant expDate = Instant.now().plusSeconds(3600);
+        tollPass1.setExpDate(expDate);
+        when(tollRepository.findByRegNumberAndCountry(regNumber, country)).thenReturn(Optional.of(tollPass1));
+
+        ValidityResponse response = tollService.checkValidity(regNumber, country);
+        assertTrue(response.getValid());
+    }
+
+
 }
