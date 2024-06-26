@@ -17,6 +17,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.Optional;
 import java.util.Set;
@@ -35,7 +36,7 @@ public class OwnerServiceImplTest {
     @Mock
     private OwnerConverter ownerConverter;
     @Mock
-    private PasswordEncoderConfig passwordEncoderConfig;
+    private PasswordEncoder passwordEncoder;
     @InjectMocks
     private OwnerServiceImpl ownerService;
 
@@ -109,7 +110,8 @@ public class OwnerServiceImplTest {
     @Test
     void loginSuccessful(){
         when(ownerRepository.findByEmail(buildLoginRequest().getEmail())).thenReturn(Optional.of(owner));
-        doReturn(true).when(passwordEncoderConfig.passwordEncoder().matches(buildLoginRequest().getPassword(),owner.getPassword()));
+        when(passwordEncoder.matches(any(),any())).thenReturn(true);
+
         OwnerResponse ownerResponse = ownerService.login(buildLoginRequest());
         assertNotNull(ownerResponse);
         assertEquals(buildLoginRequest().getEmail(),ownerResponse.getEmail());
