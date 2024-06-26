@@ -2,12 +2,17 @@ package com.example.spring_into.service.impl;
 
 
 import com.example.spring_into.converter.OwnerConverter;
+import com.example.spring_into.converter.TollConverter;
+import com.example.spring_into.dto.LoginRequest;
 import com.example.spring_into.dto.OwnerRequest;
+import com.example.spring_into.dto.OwnerResponse;
+import com.example.spring_into.dto.ValidityResponse;
 import com.example.spring_into.exception.RecordNotFoundException;
 import com.example.spring_into.model.Owner;
 import com.example.spring_into.model.TollPass;
 import com.example.spring_into.repository.OwnerRepository;
-
+import com.example.spring_into.repository.TollRepository;
+import com.example.spring_into.service.TollService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -17,11 +22,12 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.time.Instant;
-import java.time.temporal.ChronoUnit;
 import java.util.Optional;
 import java.util.Set;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.*;
 
@@ -32,15 +38,11 @@ public class OwnerServiceImplTest {
     @Mock
     private OwnerRepository ownerRepository;
     @Mock
-    private OwnerConverter ownerConverter;
-    @Mock
     private TollRepository tollRepository;
-    @Mock
-    private TollConverter tollConverter;
-    @InjectMocks
-    private TollService tollService;
+
     @Mock
     private PasswordEncoder passwordEncoder;
+
     @InjectMocks
     private OwnerServiceImpl ownerService;
 
@@ -118,24 +120,19 @@ public class OwnerServiceImplTest {
 
         OwnerResponse ownerResponse = ownerService.login(buildLoginRequest());
         assertNotNull(ownerResponse);
-        assertEquals(buildLoginRequest().getEmail(),ownerResponse.getEmail());
+        assertEquals(buildLoginRequest().getEmail(), ownerResponse.getEmail());
 
     }
+
     @Test
-    void loginUnsuccessful(){
+    void loginUnsuccessful() {
         when(ownerRepository.findByEmail(buildLoginRequest().getEmail())).thenReturn(Optional.empty());
-        RecordNotFoundException exception = assertThrows(RecordNotFoundException.class,()->ownerService.login(buildLoginRequest()));
-        verify(ownerRepository,times(1)).findByEmail(buildLoginRequest().getEmail());
+        RecordNotFoundException exception = assertThrows(RecordNotFoundException.class, () -> ownerService.login(buildLoginRequest()));
+        verify(ownerRepository, times(1)).findByEmail(buildLoginRequest().getEmail());
 
     }
 
-    private LoginRequest buildLoginRequest(){
-        LoginRequest loginRequest = new LoginRequest();
-        loginRequest.setEmail("test@test.com");
-        loginRequest.setPassword("1213123412");
-        return loginRequest;
-    }
-
+    @Test
     void findOwnerByID_success() {
         when(ownerRepository.findById(anyLong())).thenReturn(Optional.of(owner));
 
@@ -155,19 +152,19 @@ public class OwnerServiceImplTest {
         verify(ownerRepository, times(1)).findById(1L);
     }
 
-
-    @Test
-    void checkValidity() {
-        String regNumber = "A1234B";
-        String country = "Bulgaria";
-        TollPass tollPass1 = new TollPass();
-        Instant expDate = Instant.now().plusSeconds(3600);
-        tollPass1.setExpDate(expDate);
-        when(tollRepository.findByRegNumberAndCountry(regNumber, country)).thenReturn(Optional.of(tollPass1));
-
-        ValidityResponse response = tollService.checkValidity(regNumber, country);
-        assertTrue(response.getValid());
+    private LoginRequest buildLoginRequest() {
+        LoginRequest loginRequest = new LoginRequest();
+        loginRequest.setEmail("test@test.com");
+        loginRequest.setPassword("1213123412");
+        return loginRequest;
     }
 
+    private OwnerRequest buildOwnerRequest() {
+        OwnerRequest ownerRequest = new OwnerRequest();
+        ownerRequest.setEmail("test@test.com");
+        ownerRequest.setAddress("Bulgaria,Varna, Tsar Osvoboditel 122");
+        ownerRequest.setPassword("123123123");
+        return ownerRequest;
+    }
 
 }

@@ -2,8 +2,10 @@ package com.example.spring_into.service.impl;
 
 import com.example.spring_into.converter.OwnerConverter;
 import com.example.spring_into.converter.TollConverter;
+import com.example.spring_into.dto.OwnerRequest;
 import com.example.spring_into.dto.TollRequest;
 import com.example.spring_into.dto.TollResponse;
+import com.example.spring_into.dto.ValidityResponse;
 import com.example.spring_into.enums.Duration;
 import com.example.spring_into.model.Owner;
 import com.example.spring_into.model.TollPass;
@@ -17,6 +19,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.time.Instant;
 import java.util.Optional;
 import java.util.Set;
 
@@ -82,5 +85,31 @@ class TollServiceImplTest {
         verify(tollConverter, times(1)).toTollResponse(any());
     }
 
+
+    @Test
+    void checkValidity_success() {
+        String regNumber = "A1234B";
+        String country = "Bulgaria";
+        TollPass tollPass1 = new TollPass();
+        Instant expDate = Instant.now().plusSeconds(3600);
+        tollPass1.setExpDate(expDate);
+        when(tollRepository.findByRegNumberAndCountry(regNumber, country)).thenReturn(Optional.of(tollPass1));
+
+        ValidityResponse response = tollService.checkValidity(regNumber, country);
+        assertTrue(response.getValid());
+    }
+
+    @Test
+    void checkValidity_invalid() {
+        String regNumber = "A1234B";
+        String country = "Bulgaria";
+        TollPass tollPass1 = new TollPass();
+        Instant expDate = Instant.now().minusSeconds(3600);
+        tollPass1.setExpDate(expDate);
+        when(tollRepository.findByRegNumberAndCountry(regNumber, country)).thenReturn(Optional.of(tollPass1));
+
+        ValidityResponse response = tollService.checkValidity(regNumber, country);
+        assertFalse(response.getValid());
+    }
 
 }
