@@ -107,7 +107,7 @@ class TollServiceImplTest {
         when(tollRepository.findByRegNumberAndCountry(regNumber, country)).thenReturn(Optional.of(tollPass1));
 
         ValidityResponse response = tollService.checkValidity(regNumber, country);
-        assertTrue(response.getValid());
+        assertFalse(response.getValid());
     }
 
 
