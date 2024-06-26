@@ -1,7 +1,6 @@
 package com.example.spring_into.service.impl;
 
 
-import com.example.spring_into.config.PasswordEncoderConfig;
 import com.example.spring_into.converter.OwnerConverter;
 import com.example.spring_into.dto.LoginRequest;
 import com.example.spring_into.dto.OwnerRequest;
@@ -10,7 +9,6 @@ import com.example.spring_into.exception.RecordNotFoundException;
 import com.example.spring_into.model.Owner;
 import com.example.spring_into.model.TollPass;
 import com.example.spring_into.repository.OwnerRepository;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -23,7 +21,6 @@ import java.util.Optional;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.*;
 
@@ -124,11 +121,13 @@ public class OwnerServiceImplTest {
         verify(ownerRepository,times(1)).findByEmail(buildLoginRequest().getEmail());
 
     }
+
     private LoginRequest buildLoginRequest(){
         LoginRequest loginRequest = new LoginRequest();
         loginRequest.setEmail("test@test.com");
         loginRequest.setPassword("1213123412");
         return loginRequest;
+    }
 
     void findOwnerByID_success() {
         when(ownerRepository.findById(anyLong())).thenReturn(Optional.of(owner));
@@ -138,6 +137,7 @@ public class OwnerServiceImplTest {
         assertEquals("Ivan", ownerResponse.getFirstName());
         assertEquals("Ivanov", ownerResponse.getLastName());
     }
+
     @Test
     void findOwnerById_OwnerNotFound() {
 
