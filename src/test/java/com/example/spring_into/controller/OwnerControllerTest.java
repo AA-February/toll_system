@@ -33,8 +33,8 @@ class OwnerControllerTest {
     private OwnerService ownerService;
     @Autowired
     ObjectMapper objectMapper;
-    private OwnerRequest ownerRequest;
-    private OwnerResponse ownerResponse;
+     OwnerRequest ownerRequest;
+     OwnerResponse ownerResponse;
 
     @BeforeEach
     void setUp() {
@@ -64,7 +64,7 @@ class OwnerControllerTest {
 
     @Test
     void addOwner_success() throws Exception {
-        when(ownerService.addOwner(ownerRequest)).thenReturn(ownerResponse);
+        when(ownerService.addOwner(any())).thenReturn(ownerResponse);
 
         mockMvc.perform(post("/api/v1/owner")
                         .content(objectMapper.writeValueAsString(ownerRequest))
