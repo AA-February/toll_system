@@ -129,5 +129,22 @@ public class OwnerServiceImplTest {
         loginRequest.setEmail("test@test.com");
         loginRequest.setPassword("1213123412");
         return loginRequest;
+
+    void findOwnerByID_success() {
+        when(ownerRepository.findById(anyLong())).thenReturn(Optional.of(owner));
+
+        OwnerResponse ownerResponse = ownerService.findOwnerById(1L);
+        verify(ownerRepository, times(1)).findById(1L);
+        assertEquals("Ivan", ownerResponse.getFirstName());
+        assertEquals("Ivanov", ownerResponse.getLastName());
+    }
+    @Test
+    void findOwnerById_OwnerNotFound() {
+
+        when((ownerRepository.findById(anyLong()))).thenReturn(Optional.empty());
+
+        RecordNotFoundException exception = assertThrows(RecordNotFoundException.class, () -> ownerService.findOwnerById(1L));
+        assertEquals("Customer with id: 1 not found", exception.getMessage());
+        verify(ownerRepository, times(1)).findById(1L);
     }
 }
