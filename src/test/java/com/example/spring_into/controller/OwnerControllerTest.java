@@ -2,8 +2,10 @@ package com.example.spring_into.controller;
 
 import static org.hamcrest.CoreMatchers.is;
 
+import com.example.spring_into.converter.OwnerConverter;
 import com.example.spring_into.dto.OwnerRequest;
 import com.example.spring_into.dto.OwnerResponse;
+import com.example.spring_into.model.Owner;
 import com.example.spring_into.service.OwnerService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
@@ -20,6 +22,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -33,8 +36,9 @@ class OwnerControllerTest {
     private OwnerService ownerService;
     @Autowired
     ObjectMapper objectMapper;
-     OwnerRequest ownerRequest;
-     OwnerResponse ownerResponse;
+    OwnerRequest ownerRequest;
+    OwnerResponse ownerResponse;
+    Owner owner;
 
     @BeforeEach
     void setUp() {
@@ -45,6 +49,7 @@ class OwnerControllerTest {
         ownerRequest.setAddress("123 Main St");
 
         ownerResponse = new OwnerResponse();
+        ownerResponse.setId(1L);
         ownerResponse.setFirstName("John");
         ownerResponse.setLastName("Doe");
         ownerResponse.setEmail("john.doe@example.com");
@@ -57,8 +62,8 @@ class OwnerControllerTest {
         when(ownerService.addOwner(any())).thenReturn(new OwnerResponse());
 
         mockMvc.perform(post("/api/v1/owner")
-                .content(objectMapper.writeValueAsString(new OwnerRequest()))
-                .contentType(MediaType.APPLICATION_JSON))
+                        .content(objectMapper.writeValueAsString(new OwnerRequest()))
+                        .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
     }
 
@@ -70,6 +75,28 @@ class OwnerControllerTest {
                         .content(objectMapper.writeValueAsString(ownerRequest))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.firstName",is("John")));
+                .andExpect(jsonPath("$.firstName", is("John")));
+    }
+
+    @Test
+    void updateOwner_success() throws Exception {
+        when(ownerService.updateOwner(ownerRequest, ownerResponse.getId())).thenReturn(owner);
+
+        mockMvc.perform(put("/api/v1/owner/1")
+                .content(objectMapper.writeValueAsString(ownerRequest))
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.firstName", is("John")));
+
+    }
+    @Test
+    void updateOwner_not_valid() throws Exception {
+        when(ownerService.updateOwner(ownerRequest, ownerResponse.getId())).thenReturn(owner);
+
+        mockMvc.perform(put("api/v1/owner/{ownerId}")
+                        .content(objectMapper.writeValueAsString(ownerRequest))
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+
     }
 }
