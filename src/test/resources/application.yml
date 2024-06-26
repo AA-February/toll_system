@@ -9,7 +9,3 @@ spring:
   h2:
     console:
       enabled: true
-  test:
-    context:
-      failure:
-        threshold: 1000000

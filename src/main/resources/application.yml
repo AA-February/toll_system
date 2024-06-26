@@ -1,4 +1,8 @@
 spring:
+  test:
+    context:
+      failure:
+        threshold: 1000000
   autoconfigure:
     exclude[0]: org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration
     exclude[1]: org.springframework.boot.actuate.autoconfigure.security.servlet.ManagementWebSecurityAutoConfiguration
@@ -21,9 +25,6 @@ dates:
   month: 31
   year: 365
 
-spring-doc:
-  api-docs:
-    path: /api-docs
 spring-doc:
   api-docs:
     path: /api-docs
