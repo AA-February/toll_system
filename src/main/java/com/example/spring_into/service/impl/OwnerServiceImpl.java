@@ -82,7 +82,7 @@ public class OwnerServiceImpl implements OwnerService {
     @Override
     public OwnerResponse findOwnerById(Long id) {
         Owner owner = ownerRepository.findById(id)
-                .orElseThrow(() -> new RecordNotFoundException(String.format("Customer with id: %s not found", id)));
+                .orElseThrow(() -> new RecordNotFoundException(String.format("Owner with id: %s not found", id)));
         OwnerResponse ownerResponse = new OwnerResponse();
         BeanUtils.copyProperties(owner, ownerResponse);
         return ownerResponse;
