@@ -43,6 +43,7 @@ class TollServiceImplTest {
     private TollRequest tollRequest ;
     private Owner owner;
     private TollPass tollPass;
+    private TollPass tollPass1;
 
     @BeforeEach
     void setUp() {
