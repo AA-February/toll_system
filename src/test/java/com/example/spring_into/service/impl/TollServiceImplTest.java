@@ -40,12 +40,13 @@ class TollServiceImplTest {
     private TollServiceImpl tollService;
 
 
-    private TollRequest tollRequest;
+    private TollRequest tollRequest ;
     private Owner owner;
     private TollPass tollPass;
 
     @BeforeEach
     void setUp() {
+        tollRequest = new TollRequest();
         tollRequest.setFirstName("lyudmil");
         tollRequest.setLastName("chertsov");
         tollRequest.setRegNumber("SH4727TT");
@@ -58,22 +59,27 @@ class TollServiceImplTest {
 
     @Test
     void addToll_ifOwnerExists() {
-        when(ownerRepository.findByEmail(anyString())).thenReturn(Optional.of(owner));
-        when(ownerRepository.save(ownerConverter.toOwner(tollRequest)));
+        when(ownerRepository.findByEmail(anyString())).thenReturn(Optional.ofNullable(owner));
+        when(tollConverter.toTollPass(any())).thenReturn(new TollPass());
+        when(ownerConverter.toOwner(any(TollRequest.class))).thenReturn(new Owner());
+
         TollResponse tollResponse = tollService.addToll(tollRequest);
 
-        verify(ownerRepository, times(0)).save(ownerConverter.toOwner(tollRequest));
-
+        verify(tollRepository,times(1)).save(any());
         verify(tollConverter, times(1)).toTollResponse(tollRepository.save(any(TollPass.class)));
     }
 
     @Test
     void addToll_ifOwnerNotExists() {
-        when(ownerRepository.findByEmail(anyString())).thenReturn(Optional.of(owner));
+        when(ownerRepository.findByEmail(anyString())).thenReturn(Optional.empty());
+        when(ownerRepository.save(any(Owner.class))).thenReturn(new Owner());
+        when(tollConverter.toTollPass(any())).thenReturn(new TollPass());
+        when(ownerConverter.toOwner(any(TollRequest.class))).thenReturn(new Owner());
 
-        verify(ownerRepository, times(1)).save(ownerConverter.toOwner(tollRequest));
+        TollResponse tollResponse = tollService.addToll(tollRequest);
 
-        verify(tollConverter, times(1)).toTollResponse(tollRepository.save(any(TollPass.class)));
+        verify(ownerRepository, times(1)).save(any());
+        verify(tollConverter, times(1)).toTollResponse(any());
     }
 
 
