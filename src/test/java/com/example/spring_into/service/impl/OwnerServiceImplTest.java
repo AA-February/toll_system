@@ -1,21 +1,21 @@
 package com.example.spring_into.service.impl;
 
 
-import com.example.spring_into.config.PasswordEncoderConfig;
 import com.example.spring_into.converter.OwnerConverter;
+import com.example.spring_into.dto.LoginRequest;
 import com.example.spring_into.dto.OwnerRequest;
 import com.example.spring_into.dto.OwnerResponse;
 import com.example.spring_into.exception.RecordNotFoundException;
 import com.example.spring_into.model.Owner;
 import com.example.spring_into.model.TollPass;
 import com.example.spring_into.repository.OwnerRepository;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.Optional;
 import java.util.Set;
@@ -33,7 +33,7 @@ public class OwnerServiceImplTest {
     @Mock
     private OwnerConverter ownerConverter;
     @Mock
-    private PasswordEncoderConfig passwordEncoderConfig;
+    private PasswordEncoder passwordEncoder;
     @InjectMocks
     private OwnerServiceImpl ownerService;
 
@@ -45,7 +45,7 @@ public class OwnerServiceImplTest {
         owner.setEmail(OWNER_EMAIL);
         owner.setFirstName("Ivan");
         owner.setLastName("Ivanov");
-
+        owner.setPassword("ssdafasfasfasfas");
         tollPass = Set.of(new TollPass());
 
         owner.setTollPass(tollPass);
@@ -105,8 +105,31 @@ public class OwnerServiceImplTest {
     }
 
     @Test
-    void findOwnerByID_success() {
+    void loginSuccessful(){
+        when(ownerRepository.findByEmail(buildLoginRequest().getEmail())).thenReturn(Optional.of(owner));
+        when(passwordEncoder.matches(any(),any())).thenReturn(true);
 
+        OwnerResponse ownerResponse = ownerService.login(buildLoginRequest());
+        assertNotNull(ownerResponse);
+        assertEquals(buildLoginRequest().getEmail(),ownerResponse.getEmail());
+
+    }
+    @Test
+    void loginUnsuccessful(){
+        when(ownerRepository.findByEmail(buildLoginRequest().getEmail())).thenReturn(Optional.empty());
+        RecordNotFoundException exception = assertThrows(RecordNotFoundException.class,()->ownerService.login(buildLoginRequest()));
+        verify(ownerRepository,times(1)).findByEmail(buildLoginRequest().getEmail());
+
+    }
+
+    private LoginRequest buildLoginRequest(){
+        LoginRequest loginRequest = new LoginRequest();
+        loginRequest.setEmail("test@test.com");
+        loginRequest.setPassword("1213123412");
+        return loginRequest;
+    }
+
+    void findOwnerByID_success() {
         when(ownerRepository.findById(anyLong())).thenReturn(Optional.of(owner));
 
         OwnerResponse ownerResponse = ownerService.findOwnerById(1L);
@@ -114,6 +137,7 @@ public class OwnerServiceImplTest {
         assertEquals("Ivan", ownerResponse.getFirstName());
         assertEquals("Ivanov", ownerResponse.getLastName());
     }
+
     @Test
     void findOwnerById_OwnerNotFound() {
 
@@ -122,6 +146,5 @@ public class OwnerServiceImplTest {
         RecordNotFoundException exception = assertThrows(RecordNotFoundException.class, () -> ownerService.findOwnerById(1L));
         assertEquals("Customer with id: 1 not found", exception.getMessage());
         verify(ownerRepository, times(1)).findById(1L);
-
     }
 }

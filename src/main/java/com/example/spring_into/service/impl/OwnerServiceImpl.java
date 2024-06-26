@@ -12,6 +12,7 @@ import com.example.spring_into.service.OwnerService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import java.util.HashSet;
 import java.util.Optional;
@@ -25,14 +26,14 @@ public class OwnerServiceImpl implements OwnerService {
 
     private final OwnerConverter ownerConverter;
 
-    private final PasswordEncoderConfig passwordEncoderConfig;
+    private final PasswordEncoder passwordEncoder;
 
     @Autowired
     public OwnerServiceImpl(OwnerRepository ownerRepository,
-                            OwnerConverter ownerConverter, PasswordEncoderConfig passwordEncoderConfig) {
+                            OwnerConverter ownerConverter, PasswordEncoder passwordEncoder) {
         this.ownerRepository = ownerRepository;
         this.ownerConverter = ownerConverter;
-        this.passwordEncoderConfig = passwordEncoderConfig;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Override
@@ -90,7 +91,7 @@ public class OwnerServiceImpl implements OwnerService {
     public OwnerResponse login (LoginRequest loginRequest) {
         try{
             Owner owner = ownerRepository.findByEmail(loginRequest.getEmail()).get();
-           if(passwordEncoderConfig.passwordEncoder().matches(loginRequest.getPassword(),owner.getPassword()))
+           if(passwordEncoder.matches(loginRequest.getPassword(),owner.getPassword()))
            {
                OwnerResponse response = new OwnerResponse();
                BeanUtils.copyProperties(owner,response);
