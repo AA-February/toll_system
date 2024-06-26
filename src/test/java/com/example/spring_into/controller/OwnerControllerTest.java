@@ -2,6 +2,7 @@ package com.example.spring_into.controller;
 
 import static org.hamcrest.CoreMatchers.is;
 
+import com.example.spring_into.dto.LoginRequest;
 import com.example.spring_into.dto.OwnerRequest;
 import com.example.spring_into.dto.OwnerResponse;
 import com.example.spring_into.service.OwnerService;
@@ -71,5 +72,43 @@ class OwnerControllerTest {
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.firstName",is("John")));
+    }
+
+    @Test
+    public void testLogin_Success() throws Exception {
+        LoginRequest loginRequest = new LoginRequest();
+        loginRequest.setEmail("john.doe@example.com");
+        loginRequest.setPassword("password");
+
+        OwnerResponse ownerResponse = new OwnerResponse();
+        ownerResponse.setFirstName("John");
+        ownerResponse.setLastName("Doe");
+        ownerResponse.setEmail("john.doe@example.com");
+        ownerResponse.setAddress("123 Main St");
+
+        when(ownerService.login(any(LoginRequest.class))).thenReturn(ownerResponse);
+
+        mockMvc.perform(post("/api/v1/owner/login")
+                        .contentType("application/json")
+                        .content(objectMapper.writeValueAsString(loginRequest)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.firstName", is("John")))
+                .andExpect(jsonPath("$.lastName", is("Doe")))
+                .andExpect(jsonPath("$.address", is("123 Main St")))
+                .andExpect(jsonPath("$.email", is("john.doe@example.com")));
+    }
+
+
+    @Test
+    public void testLogin_Failed() throws Exception {
+        LoginRequest loginRequest = new LoginRequest();
+        OwnerResponse ownerResponse = new OwnerResponse();
+
+        when(ownerService.login(any(LoginRequest.class))).thenReturn(ownerResponse);
+
+        mockMvc.perform(post("/api/v1/owner/login")
+                        .contentType("application/json")
+                        .content(objectMapper.writeValueAsString(loginRequest)))
+                .andExpect(status().isBadRequest());
     }
 }
